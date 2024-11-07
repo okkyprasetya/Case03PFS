@@ -34,16 +34,11 @@ namespace SalesOrder.Controllers
                     query = query.Where(o => o.OrderDate.Date == orderDate.Value.Date);
                 }
 
-                var totalItems = await query.CountAsync();
-                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-                page = Math.Min(Math.Max(1, page), totalPages);
-
                 var orders = await query
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
                     .Select(o => new OrderExportModel
                     {
                         OrderId = o.SoOrderId,
+                        OrderNo = o.OrderNo,
                         OrderDate = o.OrderDate,
                         CustomerName = o.Customer.CustomerName ?? string.Empty
                     })
@@ -64,7 +59,7 @@ namespace SalesOrder.Controllers
                     foreach (var order in orders)
                     {
                         worksheet.Cell(row, 1).Value = row - 1;
-                        worksheet.Cell(row, 2).Value = order.OrderId;
+                        worksheet.Cell(row, 2).Value = order.OrderNo;
                         worksheet.Cell(row, 3).Value = order.OrderDate.ToString("yyyy-MM-dd");
                         worksheet.Cell(row, 4).Value = order.CustomerName;
                         row++;
